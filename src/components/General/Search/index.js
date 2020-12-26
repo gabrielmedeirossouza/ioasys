@@ -1,4 +1,4 @@
-import axios from 'axios'
+import api from '../../../services/Api'
 import { useState } from 'react'
 import { useHistory } from 'react-router-dom'
 
@@ -17,20 +17,15 @@ function Search({ items, searching }) {
   function search(e) {
     e.preventDefault()
 
-    axios({
-      method: 'get',
-      url: 'https://empresas.ioasys.com.br/api/v1/enterprises',
-      headers: {
-        'access-token': localStorage.getItem('access_token'),
-        'client': localStorage.getItem('client'),
-        'uid': localStorage.getItem('uid')
-      },
+    api.get('/enterprises', {
       params: {
         name: name
       }
-    }).then(resp => {
+    })
+    .then(resp => {
       items(Object.values(resp.data.enterprises) || [])
-    }).catch(() => {
+    })
+    .catch(() => {
       localStorage.clear()
       history.push('/login')
     })
