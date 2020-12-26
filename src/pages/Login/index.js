@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useHistory } from 'react-router-dom'
-import axios from 'axios'
+import api from '../../services/Api'
 
 import Button from '../../components/General/Button'
 import Loading from '../../components/Layout/Loading'
@@ -22,22 +22,17 @@ function Login() {
 
     setLoading(true)
 
-    try {
-      // "testeapple@ioasys.com.br"
-      // "12341234"
-      const response = await axios({
-        method: 'post',
-        url: 'https://empresas.ioasys.com.br/api/v1/users/auth/sign_in',
-        data: {
-          email: email,
-          password: password
-        }
-      })
-
+    // "testeapple@ioasys.com.br"
+    // "12341234"
+    api.post('/users/auth/sign_in', {
+      email: email,
+      password: password
+    })
+    .then(resp => {
       localStorage.setItem('isAuthenticated', true)
-      localStorage.setItem('access_token', response.headers['access-token'])
-      localStorage.setItem('client', response.headers.client)
-      localStorage.setItem('uid', response.headers.uid)
+      localStorage.setItem('access-token', resp.headers['access-token'])
+      localStorage.setItem('client', resp.headers.client)
+      localStorage.setItem('uid', resp.headers.uid)
 
       // Apenas para dar um delay para a tela de loading ficar mais visível...
       setTimeout(() => {
@@ -45,12 +40,12 @@ function Login() {
 
         history.push('/')
       }, 1000)
-
-    } catch (err) {
+    })
+    .catch(err => {
       setLoading(false)
       localStorage.removeItem('isAuthenticated')
-      console.log(err, 'dados incorretos!')
-    }
+      console.log(`Login service error: ${err}`)
+    })
   }
 
   function toggle() {
